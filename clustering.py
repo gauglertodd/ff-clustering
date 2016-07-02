@@ -11,16 +11,14 @@ def fix_tier_orders(A):
     not in ascending order. This method aims to fix that. '''
     inf = min(A)
     print inf
-    already_swapped = []
-    for entry in A:
-        if entry not in already_swapped and entry > inf:
-            swap(A, entry, inf)
-            already_swapped.append(entry)
+    already_swapped = [inf]
+    swap(A, inf, A[0])
+    inf = inf + 1
+    for i in range(1, len(A)):
+        if A[i] not in already_swapped:
+            swap(A, inf, A[i])
             inf = inf + 1
-        elif entry == inf:
-            already_swapped.append(inf)
-
-    return A
+            already_swapped.append(A[i])
 
 
 def swap(A, entry, inf):
@@ -31,6 +29,9 @@ def swap(A, entry, inf):
         elif A[i] == inf:
             A[i] = entry
     return
+
+
+
 
 SAVE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               "Saved")
@@ -51,9 +52,14 @@ k_means = KMeans(init='k-means++', n_clusters=10, n_init=10)
 k_means.fit(X)
 
 # af = AffinityPropagation(preference=-50).fit(X)
-A= list(k_means.labels_)
-print A
-fix_tier_orders(A)
-print A
-# print af.labels_
+tier_labels = list(k_means.labels_)
+fix_tier_orders(tier_labels)
+
+player_tiers = {}
+for i in range(len(tier_labels)):
+    if tier_labels[i] not in player_tiers.keys():
+        player_tiers[tier_labels[i]] = [players[i]]
+    else:
+        player_tiers[tier_labels[i]].append(players[i])
+print player_tiers
 
