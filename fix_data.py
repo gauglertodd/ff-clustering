@@ -26,13 +26,13 @@ def save_rankings():
         filename = directory + "/" + file_names[i]
         save_file_name = save_directory + "/" + file_names[i][:-4] + ".npy"
         thedata = np.genfromtxt(
-            filename,                 # file name
-            skip_header=5,          # lines to skip at the top
-            skip_footer=0,          # lines to skip at the bottom
-            delimiter='\t',         # column delimiter
-            dtype='string',         # data type
-            filling_values=0,       # fill missing values with 0
-            usecols=(1, 5, 6, 7, 8, 9),  # columns to read
+            filename,                      # file name
+            skip_header=5,                 # lines to skip at the top
+            skip_footer=0,                 # lines to skip at the bottom
+            delimiter='\t',                # column delimiter
+            dtype='string',                # data type
+            filling_values=0,              # fill missing values with 0
+            usecols=(1, 5, 6, 7, 8, 9),    # columns to read
             )     # column names
         np.save(save_file_name, thedata)
 
