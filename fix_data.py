@@ -33,8 +33,5 @@ def save_rankings():
             dtype='string',                # data type
             filling_values=0,              # fill missing values with 0
             usecols=(1, 5, 6, 7, 8, 9),    # columns to read
-            )     # column names
+            )
         np.save(save_file_name, thedata)
-
-
-save_rankings()
