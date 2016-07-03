@@ -57,4 +57,22 @@ for i in range(len(TIER_LABELS)):
         PLAYER_TIERS[TIER_LABELS[i]] = [PLAYERS[i]]
     else:
         PLAYER_TIERS[TIER_LABELS[i]].append(PLAYERS[i])
-print PLAYER_TIERS
+
+# print PLAYER_TIERS
+CLUSTER_NUMBER = len(PLAYER_TIERS.keys())
+
+UPDATED_PLAYER_SCORES = []
+
+for i in range(len(PLAYERS)):
+    UPDATED_PLAYER_SCORES.append([PLAYERS[i]] +
+                                 PLAYER_STATS[i] +
+                                 [TIER_LABELS[i]])
+
+    # Scheme for UPDATED_PLAYER_SCORES:
+    # 0: Name
+    # 1: Best Rank
+    # 2: Worst Rank
+    # 3: Avg Rank
+    # 4: Std Dev
+    # 5: ADP
+    # 6: Tier
