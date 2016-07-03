@@ -51,7 +51,10 @@ def swap(cluster_labels, entry, inf):
     return
 
 
-def generate_cheatsheets(NAME = "K_Means", Algorithm = KMeans(init='k-means++', n_clusters=7, n_init=10)):
+def generate_cheatsheets(NAME="K_Means",
+                         ALGORITHM=KMeans(init='k-means++',
+                                          n_clusters=7,
+                                          n_init=10)):
     '''In theory, this should just save tons of pdfs generated from a
     user-input choice in clustering algorithm.'''
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -70,11 +73,8 @@ def generate_cheatsheets(NAME = "K_Means", Algorithm = KMeans(init='k-means++', 
                     continue
 
             X = np.asarray(PLAYER_STATS)
-            #K_MEANS = KMeans(init='k-means++', n_clusters=7, n_init=10)
-            #K_MEANS.fit(X)
-            Algorithm.fit(X)
-            # af = AffinityPropagation(preference=-50).fit(X)
-            TIER_LABELS = list(Algorithm.labels_)
+            ALGORITHM.fit(X)
+            TIER_LABELS = list(ALGORITHM.labels_)
             fix_tier_orders(TIER_LABELS)
 
             PLAYER_TIERS = {}
@@ -84,9 +84,7 @@ def generate_cheatsheets(NAME = "K_Means", Algorithm = KMeans(init='k-means++', 
                 else:
                     PLAYER_TIERS[TIER_LABELS[i]].append(PLAYERS[i])
 
-            # print PLAYER_TIERS
             CLUSTER_NUMBER = len(PLAYER_TIERS.keys())
-
             UPDATED_PLAYER_SCORES = []
             TOTAL_PLAYERS = len(PLAYERS)
             for i in range(TOTAL_PLAYERS):
@@ -105,7 +103,7 @@ def generate_cheatsheets(NAME = "K_Means", Algorithm = KMeans(init='k-means++', 
                 plt.text(ORDER[i], DESCENDING_RANK[i], UPDATED_PLAYER_SCORES[i][0],
                          color=sns.xkcd_rgb[CLUSTER_COLORS[UPDATED_PLAYER_SCORES[i][6]]])
             ensure_dir(NAME)
-            plt.savefig(NAME + "/" + FILE_NAMES[COUNT] + '.pdf', bbox_inches='tight')
+            plt.savefig(NAME + "/" + FILE_NAMES[COUNT][:-4] + '.pdf', bbox_inches='tight')
             plt.clf()
         except:
             print FILE_NAMES[COUNT]
