@@ -5,6 +5,7 @@ import os
 from sklearn.cluster import KMeans
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def fix_tier_orders(cluster_labels):
@@ -83,18 +84,13 @@ for i in range(TOTAL_PLAYERS):
     # 8: Descending Rank (for graph purposes)
     # 9: Heat Rank
 
-for row in UPDATED_PLAYER_SCORES:
-    print row
-
 ORDER = range(1, TOTAL_PLAYERS + 1)
 DESCENDING_RANK = [i[8] for i in UPDATED_PLAYER_SCORES]
+CLUSTER_COLORS = sns.xkcd_rgb.keys()[1:CLUSTER_NUMBER+1]
 
-print len(ORDER)
-print len(DESCENDING_RANK)
-
-# plt.plot(ORDER, DESCENDING_RANK, 'ro')
 plt.axis([0, TOTAL_PLAYERS, 0, TOTAL_PLAYERS])
 for i in range(len(UPDATED_PLAYER_SCORES)):
-    plt.text(ORDER[i], DESCENDING_RANK[i], UPDATED_PLAYER_SCORES[i][0])
+    plt.text(ORDER[i], DESCENDING_RANK[i], UPDATED_PLAYER_SCORES[i][0],
+             color=sns.xkcd_rgb[CLUSTER_COLORS[UPDATED_PLAYER_SCORES[i][6]]])
 
 plt.show()
