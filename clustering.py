@@ -13,7 +13,6 @@
 # 9: Heat Rank
 
 import os
-from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import KMeans
 import numpy as np
 import matplotlib.pyplot as plt
