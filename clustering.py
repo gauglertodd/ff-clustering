@@ -10,7 +10,6 @@ def fix_tier_orders(A):
     ''' Sometimes, clustering algorithms provide labels that are
     not in ascending order. This method aims to fix that. '''
     inf = min(A)
-    print inf
     already_swapped = [inf]
     swap(A, inf, A[0])
     inf = inf + 1
@@ -30,36 +29,32 @@ def swap(A, entry, inf):
             A[i] = entry
     return
 
-
-
-
-SAVE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              "Saved")
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+SAVE_DIRECTORY = os.path.join(CURRENT_DIR, "Saved")
 FILE_NAMES = os.listdir(SAVE_DIRECTORY)
-x = np.load(SAVE_DIRECTORY + "/" + FILE_NAMES[1])
-players = []
-player_stats = []
-for row in x:
+LOADED_DATA = np.load(SAVE_DIRECTORY + "/" + FILE_NAMES[1])
+PLAYERS = []
+PLAYER_STATS = []
+for row in LOADED_DATA:
     try:
-        player_stats.append([float(i) for i in row[1:]])
-        players.append(row[0])
+        PLAYER_STATS.append([float(i) for i in row[1:]])
+        PLAYERS.append(row[0])
     except:
         continue
 
-X = np.asarray(player_stats)
+X = np.asarray(PLAYER_STATS)
 
-k_means = KMeans(init='k-means++', n_clusters=10, n_init=10)
-k_means.fit(X)
+K_MEANS = KMeans(init='k-means++', n_clusters=7, n_init=10)
+K_MEANS.fit(X)
 
 # af = AffinityPropagation(preference=-50).fit(X)
-tier_labels = list(k_means.labels_)
-fix_tier_orders(tier_labels)
+TIER_LABELS = list(K_MEANS.labels_)
+fix_tier_orders(TIER_LABELS)
 
-player_tiers = {}
-for i in range(len(tier_labels)):
-    if tier_labels[i] not in player_tiers.keys():
-        player_tiers[tier_labels[i]] = [players[i]]
+PLAYER_TIERS = {}
+for i in range(len(TIER_LABELS)):
+    if TIER_LABELS[i] not in PLAYER_TIERS.keys():
+        PLAYER_TIERS[TIER_LABELS[i]] = [PLAYERS[i]]
     else:
-        player_tiers[tier_labels[i]].append(players[i])
-print player_tiers
-
+        PLAYER_TIERS[TIER_LABELS[i]].append(PLAYERS[i])
+print PLAYER_TIERS
