@@ -1,7 +1,19 @@
 ''' This file does all the heavy lifting, from a ML standpoint. '''
 
-from sklearn.cluster import AffinityPropagation
+# Scheme for UPDATED_PLAYER_SCORES:
+# 0: Name
+# 1: Best Rank
+# 2: Worst Rank
+# 3: Avg Rank
+# 4: Std Dev
+# 5: ADP
+# 6: Tier
+# 7: Overall Rank
+# 8: Descending Rank (for graph purposes)
+# 9: Heat Rank
+
 import os
+from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import KMeans
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,7 +23,6 @@ import seaborn as sns
 def ensure_dir(name):
     '''Simple function to create directories
     in the case where they do not already exist'''
-    # directory = os.path.dirname(name)
     if not os.path.exists(name):
         os.makedirs(name)
 
@@ -40,7 +51,7 @@ def swap(cluster_labels, entry, inf):
     return
 
 
-def generate_cheatsheets(index=1):
+def generate_cheatsheets(NAME = "K_Means", Algorithm = KMeans(init='k-means++', n_clusters=7, n_init=10)):
     '''In theory, this should just save tons of pdfs generated from a
     user-input choice in clustering algorithm.'''
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -59,12 +70,11 @@ def generate_cheatsheets(index=1):
                     continue
 
             X = np.asarray(PLAYER_STATS)
-
-            K_MEANS = KMeans(init='k-means++', n_clusters=7, n_init=10)
-            K_MEANS.fit(X)
-
+            #K_MEANS = KMeans(init='k-means++', n_clusters=7, n_init=10)
+            #K_MEANS.fit(X)
+            Algorithm.fit(X)
             # af = AffinityPropagation(preference=-50).fit(X)
-            TIER_LABELS = list(K_MEANS.labels_)
+            TIER_LABELS = list(Algorithm.labels_)
             fix_tier_orders(TIER_LABELS)
 
             PLAYER_TIERS = {}
@@ -86,18 +96,6 @@ def generate_cheatsheets(index=1):
                                              [i] +
                                              [TOTAL_PLAYERS - i])
 
-                # Scheme for UPDATED_PLAYER_SCORES:
-                # 0: Name
-                # 1: Best Rank
-                # 2: Worst Rank
-                # 3: Avg Rank
-                # 4: Std Dev
-                # 5: ADP
-                # 6: Tier
-                # 7: Overall Rank
-                # 8: Descending Rank (for graph purposes)
-                # 9: Heat Rank
-
             ORDER = range(1, TOTAL_PLAYERS + 1)
             DESCENDING_RANK = [i[8] for i in UPDATED_PLAYER_SCORES]
             CLUSTER_COLORS = sns.xkcd_rgb.keys()[1:CLUSTER_NUMBER+1]
@@ -106,11 +104,9 @@ def generate_cheatsheets(index=1):
             for i in range(len(UPDATED_PLAYER_SCORES)):
                 plt.text(ORDER[i], DESCENDING_RANK[i], UPDATED_PLAYER_SCORES[i][0],
                          color=sns.xkcd_rgb[CLUSTER_COLORS[UPDATED_PLAYER_SCORES[i][6]]])
-
-            #OUTPUT = os.path.join(CURRENT_DIR, "K_Means")
-            #os.makedirs("K_Means")
-            ensure_dir("K_Means")
-            plt.savefig("K_Means/" + FILE_NAMES[COUNT] + '.pdf', bbox_inches='tight')
+            ensure_dir(NAME)
+            plt.savefig(NAME + "/" + FILE_NAMES[COUNT] + '.pdf', bbox_inches='tight')
+            plt.clf()
         except:
             print FILE_NAMES[COUNT]
             print "----------------------------"

@@ -46,7 +46,6 @@ def save_rankings():
                 delimiter='\t',                # column delimiter
                 dtype='string',                # data type
                 filling_values=0,              # fill missing values with 0
-                usecols=(1, 4,5, 6, 7, 8),    # columns to read
+                usecols=(1, 4, 5, 6, 7, 8),    # columns to read
                 )
         np.save(save_file_name, thedata)
-
