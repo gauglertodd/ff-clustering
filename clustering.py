@@ -4,29 +4,30 @@ from sklearn.cluster import AffinityPropagation
 import os
 from sklearn.cluster import KMeans
 import numpy as np
+import matplotlib.pyplot as plt
 
 
-def fix_tier_orders(A):
+def fix_tier_orders(cluster_labels):
     ''' Sometimes, clustering algorithms provide labels that are
     not in ascending order. This method aims to fix that. '''
-    inf = min(A)
+    inf = min(cluster_labels)
     already_swapped = [inf]
-    swap(A, inf, A[0])
+    swap(cluster_labels, inf, cluster_labels[0])
     inf = inf + 1
-    for i in range(1, len(A)):
-        if A[i] not in already_swapped:
-            swap(A, inf, A[i])
+    for i in range(1, len(cluster_labels)):
+        if cluster_labels[i] not in already_swapped:
+            swap(cluster_labels, inf, cluster_labels[i])
             inf = inf + 1
-            already_swapped.append(A[i])
+            already_swapped.append(cluster_labels[i])
 
 
-def swap(A, entry, inf):
+def swap(cluster_labels, entry, inf):
     '''a simple swap function on lists'''
-    for i in range(len(A)):
-        if A[i] == entry:
-            A[i] = inf
-        elif A[i] == inf:
-            A[i] = entry
+    for i in range(len(cluster_labels)):
+        if cluster_labels[i] == entry:
+            cluster_labels[i] = inf
+        elif cluster_labels[i] == inf:
+            cluster_labels[i] = entry
     return
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -62,11 +63,13 @@ for i in range(len(TIER_LABELS)):
 CLUSTER_NUMBER = len(PLAYER_TIERS.keys())
 
 UPDATED_PLAYER_SCORES = []
-
-for i in range(len(PLAYERS)):
+TOTAL_PLAYERS = len(PLAYERS)
+for i in range(TOTAL_PLAYERS):
     UPDATED_PLAYER_SCORES.append([PLAYERS[i]] +
                                  PLAYER_STATS[i] +
-                                 [TIER_LABELS[i]])
+                                 [TIER_LABELS[i]] +
+                                 [i] +
+                                 [TOTAL_PLAYERS - i])
 
     # Scheme for UPDATED_PLAYER_SCORES:
     # 0: Name
@@ -76,3 +79,22 @@ for i in range(len(PLAYERS)):
     # 4: Std Dev
     # 5: ADP
     # 6: Tier
+    # 7: Overall Rank
+    # 8: Descending Rank (for graph purposes)
+    # 9: Heat Rank
+
+for row in UPDATED_PLAYER_SCORES:
+    print row
+
+ORDER = range(1, TOTAL_PLAYERS + 1)
+DESCENDING_RANK = [i[8] for i in UPDATED_PLAYER_SCORES]
+
+print len(ORDER)
+print len(DESCENDING_RANK)
+
+# plt.plot(ORDER, DESCENDING_RANK, 'ro')
+plt.axis([0, TOTAL_PLAYERS, 0, TOTAL_PLAYERS])
+for i in range(len(UPDATED_PLAYER_SCORES)):
+    plt.text(ORDER[i], DESCENDING_RANK[i], UPDATED_PLAYER_SCORES[i][0])
+
+plt.show()
