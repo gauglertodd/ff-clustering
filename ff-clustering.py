@@ -43,7 +43,7 @@ def main():
     for name, alg in zip(names, algorithms):
         print "Generating cheatsheet with the {0} algorithm".format(name)
         generate_cheatsheets(name, alg)
-        print "Cheetsheet Generated."
+        print "Cheatsheet Generated."
     print "Done"
 
 
