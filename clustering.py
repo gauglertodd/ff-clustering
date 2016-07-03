@@ -8,6 +8,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
+def ensure_dir(name):
+    '''Simple function to create directories
+    in the case where they do not already exist'''
+    # directory = os.path.dirname(name)
+    if not os.path.exists(name):
+        os.makedirs(name)
+
+
 def fix_tier_orders(cluster_labels):
     ''' Sometimes, clustering algorithms provide labels that are
     not in ascending order. This method aims to fix that. '''
@@ -31,66 +39,83 @@ def swap(cluster_labels, entry, inf):
             cluster_labels[i] = entry
     return
 
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-SAVE_DIRECTORY = os.path.join(CURRENT_DIR, "Saved")
-FILE_NAMES = os.listdir(SAVE_DIRECTORY)
-LOADED_DATA = np.load(SAVE_DIRECTORY + "/" + FILE_NAMES[1])
-PLAYERS = []
-PLAYER_STATS = []
-for row in LOADED_DATA:
-    try:
-        PLAYER_STATS.append([float(i) for i in row[1:]])
-        PLAYERS.append(row[0])
-    except:
-        continue
 
-X = np.asarray(PLAYER_STATS)
+def generate_cheatsheets(index=1):
+    '''In theory, this should just save tons of pdfs generated from a
+    user-input choice in clustering algorithm.'''
+    CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+    SAVE_DIRECTORY = os.path.join(CURRENT_DIR, "Saved")
+    FILE_NAMES = os.listdir(SAVE_DIRECTORY)
+    for COUNT in range(1, len(FILE_NAMES)):
+        try:
+            LOADED_DATA = np.load(SAVE_DIRECTORY + "/" + FILE_NAMES[COUNT])
+            PLAYERS = []
+            PLAYER_STATS = []
+            for row in LOADED_DATA:
+                try:
+                    PLAYER_STATS.append([float(i) for i in row[1:]])
+                    PLAYERS.append(row[0])
+                except:
+                    continue
 
-K_MEANS = KMeans(init='k-means++', n_clusters=7, n_init=10)
-K_MEANS.fit(X)
+            X = np.asarray(PLAYER_STATS)
 
-# af = AffinityPropagation(preference=-50).fit(X)
-TIER_LABELS = list(K_MEANS.labels_)
-fix_tier_orders(TIER_LABELS)
+            K_MEANS = KMeans(init='k-means++', n_clusters=7, n_init=10)
+            K_MEANS.fit(X)
 
-PLAYER_TIERS = {}
-for i in range(len(TIER_LABELS)):
-    if TIER_LABELS[i] not in PLAYER_TIERS.keys():
-        PLAYER_TIERS[TIER_LABELS[i]] = [PLAYERS[i]]
-    else:
-        PLAYER_TIERS[TIER_LABELS[i]].append(PLAYERS[i])
+            # af = AffinityPropagation(preference=-50).fit(X)
+            TIER_LABELS = list(K_MEANS.labels_)
+            fix_tier_orders(TIER_LABELS)
 
-# print PLAYER_TIERS
-CLUSTER_NUMBER = len(PLAYER_TIERS.keys())
+            PLAYER_TIERS = {}
+            for i in range(len(TIER_LABELS)):
+                if TIER_LABELS[i] not in PLAYER_TIERS.keys():
+                    PLAYER_TIERS[TIER_LABELS[i]] = [PLAYERS[i]]
+                else:
+                    PLAYER_TIERS[TIER_LABELS[i]].append(PLAYERS[i])
 
-UPDATED_PLAYER_SCORES = []
-TOTAL_PLAYERS = len(PLAYERS)
-for i in range(TOTAL_PLAYERS):
-    UPDATED_PLAYER_SCORES.append([PLAYERS[i]] +
-                                 PLAYER_STATS[i] +
-                                 [TIER_LABELS[i]] +
-                                 [i] +
-                                 [TOTAL_PLAYERS - i])
+            # print PLAYER_TIERS
+            CLUSTER_NUMBER = len(PLAYER_TIERS.keys())
 
-    # Scheme for UPDATED_PLAYER_SCORES:
-    # 0: Name
-    # 1: Best Rank
-    # 2: Worst Rank
-    # 3: Avg Rank
-    # 4: Std Dev
-    # 5: ADP
-    # 6: Tier
-    # 7: Overall Rank
-    # 8: Descending Rank (for graph purposes)
-    # 9: Heat Rank
+            UPDATED_PLAYER_SCORES = []
+            TOTAL_PLAYERS = len(PLAYERS)
+            for i in range(TOTAL_PLAYERS):
+                UPDATED_PLAYER_SCORES.append([PLAYERS[i]] +
+                                             PLAYER_STATS[i] +
+                                             [TIER_LABELS[i]] +
+                                             [i] +
+                                             [TOTAL_PLAYERS - i])
 
-ORDER = range(1, TOTAL_PLAYERS + 1)
-DESCENDING_RANK = [i[8] for i in UPDATED_PLAYER_SCORES]
-CLUSTER_COLORS = sns.xkcd_rgb.keys()[1:CLUSTER_NUMBER+1]
+                # Scheme for UPDATED_PLAYER_SCORES:
+                # 0: Name
+                # 1: Best Rank
+                # 2: Worst Rank
+                # 3: Avg Rank
+                # 4: Std Dev
+                # 5: ADP
+                # 6: Tier
+                # 7: Overall Rank
+                # 8: Descending Rank (for graph purposes)
+                # 9: Heat Rank
 
-plt.axis([0, TOTAL_PLAYERS, 0, TOTAL_PLAYERS])
-for i in range(len(UPDATED_PLAYER_SCORES)):
-    plt.text(ORDER[i], DESCENDING_RANK[i], UPDATED_PLAYER_SCORES[i][0],
-             color=sns.xkcd_rgb[CLUSTER_COLORS[UPDATED_PLAYER_SCORES[i][6]]])
+            ORDER = range(1, TOTAL_PLAYERS + 1)
+            DESCENDING_RANK = [i[8] for i in UPDATED_PLAYER_SCORES]
+            CLUSTER_COLORS = sns.xkcd_rgb.keys()[1:CLUSTER_NUMBER+1]
 
-plt.show()
+            plt.axis([0, TOTAL_PLAYERS, 0, TOTAL_PLAYERS])
+            for i in range(len(UPDATED_PLAYER_SCORES)):
+                plt.text(ORDER[i], DESCENDING_RANK[i], UPDATED_PLAYER_SCORES[i][0],
+                         color=sns.xkcd_rgb[CLUSTER_COLORS[UPDATED_PLAYER_SCORES[i][6]]])
+
+            #OUTPUT = os.path.join(CURRENT_DIR, "K_Means")
+            #os.makedirs("K_Means")
+            ensure_dir("K_Means")
+            plt.savefig("K_Means/" + FILE_NAMES[COUNT] + '.pdf', bbox_inches='tight')
+        except:
+            print FILE_NAMES[COUNT]
+            print "----------------------------"
+            for row in LOADED_DATA:
+                print row
+            print "----------------------------"
+
+generate_cheatsheets()
