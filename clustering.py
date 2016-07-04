@@ -13,6 +13,7 @@
 # 9: Heat Rank
 
 import os
+import sys
 from sklearn.cluster import KMeans
 import numpy as np
 import matplotlib.pyplot as plt
@@ -98,17 +99,17 @@ def generate_cheatsheets(NAME="K_Means",
             CLUSTER_COLORS = sns.xkcd_rgb.keys()[1:CLUSTER_NUMBER+1]
 
             plt.axis([0, TOTAL_PLAYERS, 0, TOTAL_PLAYERS])
+            plt.rc("font", size=2)
             for i in range(len(UPDATED_PLAYER_SCORES)):
                 plt.text(ORDER[i], DESCENDING_RANK[i], UPDATED_PLAYER_SCORES[i][0],
                          color=sns.xkcd_rgb[CLUSTER_COLORS[UPDATED_PLAYER_SCORES[i][6]]])
             ensure_dir(NAME)
-            plt.savefig(NAME + "/" + FILE_NAMES[COUNT][:-4] + '.pdf', bbox_inches='tight')
+            #plt.set_size_inches(12,12)
+            plt.savefig(NAME + "/" + FILE_NAMES[COUNT][:-4] + '.pdf')
             plt.clf()
-        except:
-            print FILE_NAMES[COUNT]
-            print "----------------------------"
-            for row in LOADED_DATA:
-                print row
-            print "----------------------------"
+            plt.close()
+
+        except Exception, e: print str(e)
+          #  print "Unexpected error:", sys.exc_info()[0]
 
 generate_cheatsheets()

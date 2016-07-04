@@ -15,7 +15,8 @@ from get_rankings import get_ranks
 
 
 def main():
-    '''docstring'''
+    '''Runs the algorithms found in 'algorithms' against the player data obtained
+    and fixed up by the other modules.'''
     names = ["Affinity-Propagation",
              "K-means",
              "Mini-Batch-Kmeans",
